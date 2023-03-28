@@ -50,6 +50,7 @@ body {
     height: 50px;
     background-color: #1b263b;
     color: #e0e1dd;
+    font-size: 14px;
     border: none;
     border-radius: 3px;
     cursor: pointer;
@@ -78,4 +79,5 @@ body {
 
 .slider_container input {
     width: 90%;
+    max-width: 600px;
 }
