@@ -93,8 +93,13 @@ body {
   grid-column: 1 / 2;
 }
 
+
 input[type="file"] {
   display: none;
+}
+
+.no-image-uploaded {
+  grid-column: 1 / 3;
 }
 
 .custom-file-button {
@@ -142,7 +147,7 @@ input[type="file"]::-webkit-file-upload-button {
 
   .photo_sidebar_section {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 40px 240px;
+    grid-template-rows: 1fr auto;
   }
 
   .sidebar_container {
@@ -150,7 +155,7 @@ input[type="file"]::-webkit-file-upload-button {
     grid-row: 3 / 4;
     justify-content: center;
     gap: 12px;
-    padding: 0 8px;
+    padding: 8px;
 }
 
 .sidebar_button {

@@ -58,9 +58,7 @@ export default function App() {
   const [options, setOptions] = useState(DEFAULT_OPTIONS);
   const [activeOptionIndex, setActiveOptionIndex] = useState(0);
   const activeOption = options[activeOptionIndex];
-  const [selectedImage, setSelectedImage] = useState(
-    "https://images.unsplash.com/photo-1679847727418-33ef58d86ebe?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80"
-  );
+  const [selectedImage, setSelectedImage] = useState(null);
   const imageRef = useRef(null);
   let sliderValue = 1;
 
@@ -125,7 +123,7 @@ export default function App() {
       <div className="navbar_container">React Photoshop</div>
       <div className="photo_sidebar_section">
         <div className="photo_container">
-          {selectedImage && ( // Use selectedImage if available, otherwise use the default image
+          {selectedImage && (
             <img
               ref={imageRef}
               className="image_to_edit"
@@ -135,7 +133,7 @@ export default function App() {
             />
           )}
         </div>
-        {selectedImage && ( // Use selectedImage if available, otherwise use the default image
+        {selectedImage && (
           <div className="slider_container">
             <input
               type="range"
@@ -147,36 +145,40 @@ export default function App() {
             />
           </div>
         )}
-        <div className="sidebar_container">
-          {options.map((option, index) => (
-            <SidebarButton
-              key={index}
-              index={index}
-              activeIndex={activeOptionIndex}
-              name={option.name}
-              handleIndexChange={handleIndexChange}
+        {selectedImage && (
+          <div className="sidebar_container">
+            {options.map((option, index) => (
+              <SidebarButton
+                key={index}
+                index={index}
+                activeIndex={activeOptionIndex}
+                name={option.name}
+                handleIndexChange={handleIndexChange}
+              />
+            ))}
+          </div>
+        )}
+        <div className={`image_control_buttons ${!selectedImage ? "no-image-uploaded" : ""}`}>
+          <div className="upload_container">
+            <input
+              type="file"
+              id="image-upload"
+              accept="image/*"
+              onChange={handleImageUpload}
+              title="tet"
             />
-          ))}
+            <label htmlFor="image-upload" className="custom-file-button">
+              Choose an Image
+            </label>
+          </div>
+          {selectedImage && (
+          <div className="download_container">
+            <button className="styled_button" onClick={handleDownload}>
+              Download
+            </button>
+          </div>
+          )}
         </div>
-      <div className="image_control_buttons">
-        <div className="upload_container">
-          <input
-            type="file"
-            id="image-upload"
-            accept="image/*"
-            onChange={handleImageUpload}
-            title="tet"
-          />
-          <label htmlFor="image-upload" className="custom-file-button">
-            Choose an Image
-          </label>
-        </div>
-        <div className="download_container">
-          <button className="styled_button" onClick={handleDownload}>
-            Download
-          </button>
-        </div>
-      </div>
       </div>
     </div>
   );
