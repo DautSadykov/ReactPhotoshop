@@ -92,30 +92,22 @@ export default function App() {
   }
 
   function handleDownload() {
-    // Get the canvas element
     const canvas = document.createElement("canvas");
-    console.log(canvas);
     const context = canvas.getContext("2d");
 
-    // Set the canvas size to match the image size
     const imageElement = imageRef.current;
-    console.log(imageRef);
     canvas.width = imageElement.width;
     canvas.height = imageElement.height;
-    console.log(canvas);
 
-    // Apply the image filters to the canvas
     context.filter = getImageStyle().filter;
     context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
 
-    // Convert the canvas to a data URL
     const dataURL = canvas.toDataURL("image/png");
 
-    // Create a link and trigger the download
     const link = document.createElement("a");
     link.download = "edited-image.png";
     link.href = dataURL;
-    // link.click();
+    link.click();
   }
 
   return (
