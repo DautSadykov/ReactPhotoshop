@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import SidebarButton from "./components/SidebarButton";
-
 
 const DEFAULT_OPTIONS = [
   {
@@ -9,9 +8,9 @@ const DEFAULT_OPTIONS = [
     value: 100,
     range: {
       min: 0,
-      max: 200
+      max: 200,
     },
-    unit: "%"
+    unit: "%",
   },
   {
     name: "Contrast",
@@ -19,9 +18,9 @@ const DEFAULT_OPTIONS = [
     value: 100,
     range: {
       min: 0,
-      max: 200
+      max: 200,
     },
-    unit: "%"
+    unit: "%",
   },
   {
     name: "Saturation",
@@ -29,9 +28,9 @@ const DEFAULT_OPTIONS = [
     value: 100,
     range: {
       min: 0,
-      max: 200
+      max: 200,
     },
-    unit: "%"
+    unit: "%",
   },
   {
     name: "Hue Rotate",
@@ -39,9 +38,9 @@ const DEFAULT_OPTIONS = [
     value: 0,
     range: {
       min: 0,
-      max: 360
+      max: 360,
     },
-    unit: "deg"
+    unit: "deg",
   },
   {
     name: "Grayscale",
@@ -49,93 +48,136 @@ const DEFAULT_OPTIONS = [
     value: 0,
     range: {
       min: 0,
-      max: 100
+      max: 100,
     },
-    unit: "%"
+    unit: "%",
   },
-  
-]
+];
 
 export default function App() {
-  const [options, setOptions] = useState(DEFAULT_OPTIONS)
-  const [activeOptionIndex, setActiveOptionIndex] = useState(0)
-  const activeOption = options[activeOptionIndex]
-  const [selectedImage, setSelectedImage] = useState(null);
-  let sliderValue = 1
-
+  const [options, setOptions] = useState(DEFAULT_OPTIONS);
+  const [activeOptionIndex, setActiveOptionIndex] = useState(0);
+  const activeOption = options[activeOptionIndex];
+  const [selectedImage, setSelectedImage] = useState(
+    "https://images.unsplash.com/photo-1679847727418-33ef58d86ebe?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80"
+  );
+  const imageRef = useRef(null);
+  let sliderValue = 1;
 
   function handleSliderChange(event) {
-    
-    setOptions(prevOption => {
+    setOptions((prevOption) => {
       const updatedOptions = prevOption.map((option, index) => {
-        if (activeOptionIndex === index) return {...option, value: event.target.value}
-        return option
-      })
-      return updatedOptions
-    })
+        if (activeOptionIndex === index)
+          return { ...option, value: event.target.value };
+        return option;
+      });
+      return updatedOptions;
+    });
   }
 
   function handleIndexChange(index) {
-    setActiveOptionIndex(index)
-    sliderValue = activeOption.value
+    setActiveOptionIndex(index);
+    sliderValue = activeOption.value;
   }
 
   function getImageStyle() {
-    const filters = options.map(option => {
-      return `${option.property}(${option.value}${option.unit})`
-    })
-    return { filter: filters.join(" ") }
+    const filters = options.map((option) => {
+      return `${option.property}(${option.value}${option.unit})`;
+    });
+    return { filter: filters.join(" ") };
   }
 
   function handleImageUpload(event) {
     const imageFile = event.target.files[0];
     const imageUrl = URL.createObjectURL(imageFile);
-    console.log(imageUrl)
     setSelectedImage(imageUrl);
   }
 
-  return(
+  function handleDownload() {
+    // Get the canvas element
+    const canvas = document.createElement("canvas");
+    console.log(canvas);
+    const context = canvas.getContext("2d");
+
+    // Set the canvas size to match the image size
+    const imageElement = imageRef.current;
+    console.log(imageRef);
+    canvas.width = imageElement.width;
+    canvas.height = imageElement.height;
+    console.log(canvas);
+
+    // Apply the image filters to the canvas
+    context.filter = getImageStyle().filter;
+    context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+
+    // Convert the canvas to a data URL
+    const dataURL = canvas.toDataURL("image/png");
+
+    // Create a link and trigger the download
+    const link = document.createElement("a");
+    link.download = "edited-image.png";
+    link.href = dataURL;
+    // link.click();
+  }
+
+  return (
     <div className="main">
       <div className="navbar_container">React Photoshop</div>
-      <div className="photo_container">
-      <div className="photo_container">
+      <div className="photo_sidebar_section">
+        <div className="photo_container">
+          {selectedImage && ( // Use selectedImage if available, otherwise use the default image
+            <img
+              ref={imageRef}
+              className="image_to_edit"
+              src={selectedImage}
+              style={getImageStyle()}
+              alt="Uploaded"
+            />
+          )}
+        </div>
         {selectedImage && ( // Use selectedImage if available, otherwise use the default image
-          <img className="image_to_edit" src={selectedImage} style={getImageStyle()} alt="Uploaded" />
+          <div className="slider_container">
+            <input
+              type="range"
+              min={activeOption.range.min}
+              max={activeOption.range.max}
+              step="0.01"
+              value={activeOption.value}
+              onChange={handleSliderChange}
+            />
+          </div>
         )}
-      </div>
-      </div>
-      <div className="slider_container">
-        <input 
-          type="range" 
-          min={activeOption.range.min}
-          max={activeOption.range.max}
-          step="0.01"
-          value={activeOption.value}
-          onChange={handleSliderChange}
-        />
-      </div>
-      <div className="sidebar_container">
-        {options.map((option, index) => (
-          <SidebarButton 
-            key = {index}
-            index = {index}
-            activeIndex = {activeOptionIndex}
-            name = {option.name}
-            handleIndexChange = {handleIndexChange}
+        <div className="sidebar_container">
+          {options.map((option, index) => (
+            <SidebarButton
+              key={index}
+              index={index}
+              activeIndex={activeOptionIndex}
+              name={option.name}
+              handleIndexChange={handleIndexChange}
+            />
+          ))}
+        </div>
+      <div className="image_control_buttons">
+        <div className="upload_container">
+          <input
+            type="file"
+            id="image-upload"
+            accept="image/*"
+            onChange={handleImageUpload}
+            title="tet"
           />
-        ))}
+          <label htmlFor="image-upload" className="custom-file-button">
+            Choose an Image
+          </label>
+        </div>
+        <div className="download_container">
+          <button className="styled_button" onClick={handleDownload}>
+            Download
+          </button>
+        </div>
       </div>
-      <div className="upload_container">
-        <label htmlFor="image-upload" className="upload_label">
-          Upload Image
-        </label>
-        <input
-          type="file"
-          id="image-upload"
-          accept="image/*"
-          onChange={handleImageUpload}
-        />
       </div>
     </div>
-  )
+  );
 }
